@@ -1,5 +1,4 @@
 function Home() {
-    return <h1>Teste 2</h1>
+    return <h1>Todo dia é dia!</h1>
 }
-
 export default Home;
