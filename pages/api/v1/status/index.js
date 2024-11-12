@@ -1,9 +1,21 @@
 import database from "infra/database.js";
 
 async function status(request, response) {
-  const result = await database.query("Select 1 + 1 as sum;");
-  console.log(result.rows);
-  response.status(200).json({ chave: "são acima da média" });
+  //Controller
+  const updatedAt = new Date().toISOString();
+
+  const databaseVersionResult = await database.query("SHOW server_version;");
+  const databaseVersionValue = databaseVersionResult.rows[0].server_version;
+
+  //View
+  response.status(200).json({
+    updated_at: updatedAt,
+    dependencies: {
+      database: {
+        version: databaseVersionValue,
+      },
+    },
+  });
 }
 
 export default status;
