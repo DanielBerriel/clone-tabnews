@@ -28,10 +28,12 @@ async function getNewClient() {
   return client;
 }
 
-export default {
-  query: query,
+const database = {
+  query,
   getNewClient,
 };
+
+export default database;
 
 function getSSLValues() {
   //SALVEI NO BLOCO DE NOTAS UMA EXPLICAÇÃO DESSA PARTE
