@@ -4,7 +4,8 @@
   "description": "Projeto de estudo: clone do https://www.tabnews.com.br",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run services:up && npm run services:wait:database && npm run migrations:up && next dev",
+    "dev": "trap 'exit $?' INT TERM; npm run services:up && npm run services:wait:database && npm run migrations:up && next dev",
+    "postdev": "npm run services:down",
     "test": "npm run services:up && concurrently -n next,jest --hide next --kill-others --success command-jest \"next dev\" \"jest --runInBand --verbose\"",
     "posttest": "npm run services:stop",
     "test:watch": "jest --watchAll --runInBand",
