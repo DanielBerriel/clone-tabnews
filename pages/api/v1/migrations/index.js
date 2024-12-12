@@ -1,5 +1,5 @@
 import migrationRunner from "node-pg-migrate"; //o migrationRunner será a função que roda o node-pg-migrate. Para isso precisamos passar um objeto como parâmetro dessa função, que tenha todas as informações necessárias para rodar nossas migrations. E como resultado retornar um objeto contendo as seguintes informações {path:,name:,timestamp:,}
-import { join } from "node:path"; //importamos a função join do node:path para garantir que a forma como que o caminho do arquivo está sendo passado seja compatível com o sistema operacional que está executando
+import { resolve } from "node:path"; //importamos a função resolve do node:path para garantir que a forma como que o caminho do arquivo está sendo passado seja compatível com o sistema operacional que está executando
 import database from "infra/database.js";
 
 export default async function migrations(request, response) {
@@ -21,7 +21,7 @@ export default async function migrations(request, response) {
       //databaseUrl: process.env.DATABASE_URL,
       dbClient: dbClient,
       dryRun: true,
-      dir: join("infra", "migrations"),
+      dir: resolve("infra", "migrations"),
       direction: "up",
       verbose: true,
       migrationsTable: "pgmigrations",
