@@ -7,10 +7,11 @@ async function query(queryObject) {
     const result = await client.query(queryObject);
     return result;
   } catch (error) {
+    console.log("\n Erro dentro do catch do database.js:");
     console.error(error);
     throw error;
   } finally {
-    await client.end();
+    await client?.end(); //'?' Optional Chaining (Encadeamento Opcional); Vai verificar se esse client existe ou não, no nosso caso se ele é undefined, porque existir ele existe, já que foi declarado anteriormente.Dessa forma ele não vai lançar um erro, só retorna undefined.
   }
 }
 
