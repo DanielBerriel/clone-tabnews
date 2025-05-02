@@ -1,0 +1,28 @@
+import { InternalServerError, MethodNotAllowedError } from "infra/errors";
+
+function onNoMatchHandler(request, response) {
+  const publicErrorObject = new MethodNotAllowedError();
+  response.status(publicErrorObject.statusCode).json(publicErrorObject);
+}
+
+function onErrorHandler(error, request, response) {
+  //o try é tudo que está dentro das funções handler
+  //enquanto esse código é relativo ao bloco catch que captura e trata o erro
+  const publicErrorObject = new InternalServerError({
+    statusCode: error.statusCode,
+    cause: error,
+  });
+
+  console.error(publicErrorObject);
+
+  response.status(publicErrorObject.statusCode).json(publicErrorObject);
+}
+
+const controller = {
+  errorHandlers: {
+    onNoMatch: onNoMatchHandler, //objeto de configuração. No caso de não encontrar um tratador para a rota, devemos o usar o tratador onNoMatchHandler.
+    onError: onErrorHandler,
+  },
+};
+
+export default controller;
