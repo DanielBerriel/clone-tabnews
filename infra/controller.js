@@ -1,4 +1,8 @@
-import { InternalServerError, MethodNotAllowedError } from "infra/errors";
+import {
+  InternalServerError,
+  MethodNotAllowedError,
+  ValidationError,
+} from "infra/errors";
 
 function onNoMatchHandler(request, response) {
   const publicErrorObject = new MethodNotAllowedError();
@@ -8,6 +12,11 @@ function onNoMatchHandler(request, response) {
 function onErrorHandler(error, request, response) {
   //o try é tudo que está dentro das funções handler
   //enquanto esse código é relativo ao bloco catch que captura e trata o erro
+
+  if (error instanceof ValidationError) {
+    return response.status(error.statusCode).json(error);
+  }
+
   const publicErrorObject = new InternalServerError({
     statusCode: error.statusCode,
     cause: error,
