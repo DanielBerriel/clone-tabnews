@@ -1,3 +1,5 @@
+import * as cookie from "cookie";
+import session from "models/session.js";
 import {
   InternalServerError,
   MethodNotAllowedError,
@@ -32,11 +34,23 @@ function onErrorHandler(error, request, response) {
   response.status(publicErrorObject.statusCode).json(publicErrorObject);
 }
 
+async function setSessionCookie(sessionToken, response) {
+  const setCookie = cookie.serialize("session_id", sessionToken, {
+    path: "/",
+    maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000, //dividimos por mil para transformar de milisegundos em segundos
+    secure: process.env.NODE_ENV === "production", //dessa forma continuamos pordendo usar o http para fazer testes localmente
+    httpOnly: true,
+  });
+
+  response.setHeader("Set-Cookie", setCookie); //`"Set-Cookie", session_id=${newSession.token}; Path=/`
+}
+
 const controller = {
   errorHandlers: {
     onNoMatch: onNoMatchHandler, //objeto de configuração. No caso de não encontrar um tratador para a rota, devemos o usar o tratador onNoMatchHandler.
     onError: onErrorHandler,
   },
+  setSessionCookie,
 };
 
 export default controller;
