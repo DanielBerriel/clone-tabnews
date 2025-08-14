@@ -126,15 +126,17 @@ describe("GET /api/v1/user", () => {
     });
 
     test("With close to expiring session", async () => {
+      jest.useFakeTimers({
+        now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS + 30000),
+      });
+
       const createdUser = await orchestrator.createUser({
         username: "UserWithCloseExpiringSession",
       });
 
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
-      jest.useFakeTimers({
-        now: new Date(Date.now() + session.EXPIRATION_IN_MILLISECONDS - 60000),
-      });
+      jest.useRealTimers();
 
       const response = await fetch("http://localhost:3000/api/v1/user", {
         headers: {
@@ -157,6 +159,41 @@ describe("GET /api/v1/user", () => {
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
+
+      // Sessions renewal assertions
+      const renewedSessionObject = await session.findOneValidByToken(
+        sessionObject.token,
+      );
+
+      expect(
+        renewedSessionObject.expires_at > sessionObject.expires_at,
+      ).toEqual(true);
+      expect(
+        renewedSessionObject.updated_at > sessionObject.updated_at,
+      ).toEqual(true);
+
+      //checking 30-day validity
+      const expires_at = new Date(renewedSessionObject.expires_at);
+      const updated_at = new Date(renewedSessionObject.updated_at);
+      expires_at.setMilliseconds(0);
+      updated_at.setMilliseconds(0);
+
+      expect(expires_at - updated_at).toEqual(
+        session.EXPIRATION_IN_MILLISECONDS,
+      );
+
+      // Set-Cookie assertions
+      const parsedSetCookie = setCookieParser(response, {
+        map: true,
+      });
+
+      expect(parsedSetCookie.session_id).toEqual({
+        name: "session_id",
+        value: sessionObject.token,
+        maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
+        path: "/",
+        httpOnly: true,
+      });
     });
   });
 });
