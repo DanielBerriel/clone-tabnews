@@ -17,11 +17,12 @@ function onErrorHandler(error, request, response) {
   //o try é tudo que está dentro das funções handler
   //enquanto esse código é relativo ao bloco catch que captura e trata o erro
 
-  if (
-    error instanceof ValidationError ||
-    error instanceof NotFoundError ||
-    error instanceof UnauthorizedError
-  ) {
+  if (error instanceof ValidationError || error instanceof NotFoundError) {
+    return response.status(error.statusCode).json(error);
+  }
+
+  if (error instanceof UnauthorizedError) {
+    clearSessionCookie(response);
     return response.status(error.statusCode).json(error);
   }
 
