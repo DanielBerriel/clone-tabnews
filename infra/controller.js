@@ -45,12 +45,24 @@ async function setSessionCookie(sessionToken, response) {
   response.setHeader("Set-Cookie", setCookie); //`"Set-Cookie", session_id=${newSession.token}; Path=/`
 }
 
+async function clearSessionCookie(response) {
+  const setCookie = cookie.serialize("session_id", "invalid", {
+    path: "/",
+    maxAge: -1,
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+  });
+
+  response.setHeader("Set-Cookie", setCookie); //`"Set-Cookie", session_id=${newSession.token}; Path=/`
+}
+
 const controller = {
   errorHandlers: {
     onNoMatch: onNoMatchHandler, //objeto de configuração. No caso de não encontrar um tratador para a rota, devemos o usar o tratador onNoMatchHandler.
     onError: onErrorHandler,
   },
   setSessionCookie,
+  clearSessionCookie,
 };
 
 export default controller;
