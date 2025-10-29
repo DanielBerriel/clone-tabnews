@@ -83,6 +83,10 @@ async function getLastEmail() {
   const emailListBody = await emailListResponse.json();
   const lastEmailItem = emailListBody.pop(); //pega o último item do array, que no caso é o último email enviado
 
+  if (!lastEmailItem) {
+    return null;
+  }
+
   const emailTextResponse = await fetch(
     `${emailHttpUrl}/messages/${lastEmailItem.id}.plain`, //Para pergarmos o corpo do email precisamos fazer uma requisição desse tipo. ".plain" para retornar a versão do corpo em texto simples. Poderiamos usar tambem ".html" para retornar o corpo em html
   );
