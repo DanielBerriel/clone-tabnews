@@ -37,7 +37,7 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
         now: new Date(Date.now() - activation.EXPIRATION_IN_MILLISECONDS),
       });
 
-      const createdUser = await orchestrator.createUser();
+      const createdUser = await orchestrator.createUser({ username: "erro" });
       //como o usuário foi criado por fora do controller do /users, não será criado um token de ativação, por isso vamos criar um token manualmente;
       const expiredActivationToken = await activation.create(createdUser.id);
 
@@ -64,7 +64,7 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
     });
 
     test("With already used token", async () => {
-      const createdUser = await orchestrator.createUser();
+      const createdUser = await orchestrator.createUser({ username: "here" });
       const activationToken = await activation.create(createdUser.id);
 
       const response1 = await fetch(
